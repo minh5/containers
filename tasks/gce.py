@@ -5,13 +5,14 @@ from invoke import task
 DEFAULTS = {
     'PROJECT': os.environ.get('GCE_PROJ'),
     'ZONE': os.environ.get('GCE_ZONE'),
-    'N_NODES': 4
+    'N_NODES': 4,
+    'MACHINE': 'n1-standard-2'
 }
 
 @task
-def start(ctx, machine='n1-standard-2'):
+def start(ctx,  name=None):
     cmd = """
-    gcloud alpha container clusters create instances \
+    gcloud alpha container clusters create {name} \
         --machine-type "{machine}" \
         --num-nodes "{nnodes}" \
         --zone {zone} \
@@ -21,15 +22,16 @@ def start(ctx, machine='n1-standard-2'):
         --max-nodes 8 \
         --preemptible
     """.format(
-        machine=machine,
+        name=name,
+        machine=DEFAULTS['MACHINE'],
+        nnodes=DEFAULTS['N_NODES'],
         zone=DEFAULTS['ZONE'],
         project=DEFAULTS['PROJECT'],
-        nnodes=DEFAULTS['N_NODES']
     )
     ctx.run(cmd, echo=True)
 
-def get_instance_group(ctx):
-    stdout = ctx.run('gcloud compute instance-groups list').stdout
+def get_cluster_name(ctx):
+    stdout = ctx.run('gcloud alpha container clusters list').stdout
     return stdout.split('\n')[1].split()[0] 
 
 @task
@@ -38,5 +40,5 @@ def add_to_firewall(ctx):
 
 @task
 def stop(ctx):
-    grp = get_instance_group(ctx)
-    ctx.run('gcloud compute instance-groups managed delete %s' % grp, echo=True)
+    grp = get_cluster_name(ctx)
+    ctx.run('gcloud alpha container clusters delete %s' % grp, echo=True)
