@@ -13,7 +13,7 @@ def _install(ctx, name):
     chart_path = DEFAULTS['CHARTS_DIR'] + name
     ctx.run('helm install --name %s %s' % (name, chart_path), echo=True)
 
-@task(name='init')
+@task
 def install(ctx, name='all'):
     if name == 'all':
         for chart in os.listdir('~/sandbox/charts/'):

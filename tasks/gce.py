@@ -10,7 +10,7 @@ DEFAULTS = {
 }
 
 @task
-def start(ctx,  name=None):
+def start(ctx,  name='sandbox'):
     cmd = """
     gcloud alpha container clusters create {name} \
         --machine-type "{machine}" \

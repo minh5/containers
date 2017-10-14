@@ -1,0 +1,37 @@
+FROM openjdk:8-jre
+
+MAINTAINER minh
+
+ENV SPARK_VERSION 2.2.0
+ENV HADOOP_VERSION 2.7.4 
+ENV HADOOP_HOME /opt/hadoop
+ENV PATH ${PATH}:/opt/hadoop/bin
+ENV SPARK_HOME /usr/local/spark
+
+USER root
+RUN apt-get update && \
+    apt-get install -y scala && \
+    apt-get clean
+
+RUN mkdir -p /opt && \
+    wget -q http://apache.cs.utah.edu/hadoop/common/hadoop-$HADOOP_VERSION/hadoop-$HADOOP_VERSION.tar.gz && \
+    tar -zxf hadoop-${HADOOP_VERSION}.tar.gz && \
+    mv hadoop-${HADOOP_VERSION} $HADOOP_HOME && \
+    chown -R root:root $HADOOP_HOME
+
+RUN wget -q https://d3kbcqa49mib13.cloudfront.net/spark-${SPARK_VERSION}-bin-hadoop2.7.tgz && \
+    tar -xzf spark-${SPARK_VERSION}-bin-hadoop2.7.tgz
+
+RUN mkdir -p $SPARK_HOME/lib && cd $SPARK_HOME/lib && \
+  curl -O https://storage.googleapis.com/hadoop-lib/gcs/gcs-connector-latest-hadoop2.jar && \
+  curl -O https://jdbc.postgresql.org/download/postgresql-42.1.3.jar && \
+  curl -O http://central.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.7.3/hadoop-aws-2.7.3.jar && \
+  curl -O http://central.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4.2/aws-java-sdk-1.7.4.2.jar
+
+ENV PYSPARK_DRIVER_PYTHON jupyter
+ENV PYSPARK_DRIVER_PYTHON_OPTS 'notebook'
+ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
+
+EXPOSE 8888
+ENV IMAGE_NAME "spark"
+
