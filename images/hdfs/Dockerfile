@@ -34,3 +34,12 @@ RUN cd $HADOOP_HOME/share/hadoop/common && \
 COPY ./config/core-site.xml $HADOOP_HOME/etc/hadoop
 COPY ./config/hdfs-site.xml $HADOOP_HOME/etc/hadoop
 COPY ./config/slaves $HADOOP_HOME/etc/hadoop
+
+# Hdfs ports
+EXPOSE 50010 50020 50070 50075 50090 8020 9000
+# Mapred ports
+EXPOSE 10020 19888
+#Yarn ports
+EXPOSE 8030 8031 8032 8033 8040 8042 8088
+#Other ports
+EXPOSE 49707 2122
