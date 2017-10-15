@@ -14,6 +14,11 @@ RUN pip3 install -r /root/requirements.txt && \
 RUN mkdir -p root/notebooks && \
     chmod +x root/docker-entrypoint.sh
 
+# set for pyspark notebook
+ENV PYSPARK_DRIVER_PYTHON jupyter
+ENV PYSPARK_DRIVER_PYTHON_OPTS 'notebook'
+ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
+
 EXPOSE 8888
 VOLUME root/notebooks
 

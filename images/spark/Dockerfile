@@ -33,11 +33,6 @@ RUN mkdir -p $SPARK_HOME/lib && cd $SPARK_HOME/lib && \
   curl -O http://central.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.7.3/hadoop-aws-2.7.3.jar && \
   curl -O http://central.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4.2/aws-java-sdk-1.7.4.2.jar
 
-# set for pyspark notebook
-ENV PYSPARK_DRIVER_PYTHON jupyter
-ENV PYSPARK_DRIVER_PYTHON_OPTS 'notebook'
-ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
-
 EXPOSE 8888
 ENV IMAGE_NAME "spark"
 

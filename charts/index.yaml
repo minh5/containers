@@ -1,0 +1,22 @@
+apiVersion: v1
+entries:
+  hadoop:
+  - apiVersion: v1
+    appVersion: 2.7.3
+    created: 2017-10-15T17:19:13.113629051-04:00
+    description: The Apache Hadoop software library is a framework that allows for
+      the distributed processing of large data sets across clusters of computers using
+      simple programming models.
+    digest: 7bf463442de153b85687e3047850b65cef5c1c1fdc7099a5c8384275602f0850
+    home: https://hadoop.apache.org/
+    icon: http://hadoop.apache.org/images/hadoop-logo.jpg
+    maintainers:
+    - email: disla@google.com
+      name: danisla
+    name: hadoop
+    sources:
+    - https://github.com/apache/hadoop
+    urls:
+    - http://127.0.0.1:8879/hadoop-1.0.1.tgz
+    version: 1.0.1
+generated: 2017-10-15T17:19:13.111607239-04:00

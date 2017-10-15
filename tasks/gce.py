@@ -35,10 +35,6 @@ def get_cluster_name(ctx):
     return stdout.split('\n')[1].split()[0] 
 
 @task
-def add_to_firewall(ctx):
-    pass
-
-@task
 def stop(ctx):
     grp = get_cluster_name(ctx)
     ctx.run('gcloud alpha container clusters delete %s' % grp, echo=True)

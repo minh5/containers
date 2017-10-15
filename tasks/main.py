@@ -11,9 +11,9 @@ DEFAULTS = {
 def start(ctx, driver='xhyve'):
     cmd = """
     minikube start --vm-driver={driver} \
-    --memory={memory}
-    --cpus={cpus} 
-    --disk-size={size}
+    --memory={memory} \
+    --cpus={cpus} \
+    --disk-size={size} \
     """.format(
         driver=driver,
         memory=DEFAULTS['MEM'],
