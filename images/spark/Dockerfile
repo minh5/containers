@@ -4,13 +4,14 @@ MAINTAINER minh
 
 ENV SPARK_VERSION     2.2.0
 ENV HADOOP_VERSION    2.7.4 
-ENV HADOOP_HOME       /usr/local/hadoop
-ENV SPARK_HOME        /usr/local/spark
-ENV PATH              ${PATH}:$HADOOP_HOME
+ENV HADOOP_HOME       /opt/hadoop
+ENV SPARK_HOME        /opt/spark
+ENV SPARK_CONF_DIR    ${SPARK_HOME}/conf 
+ENV PATH              ${PATH}:$HADOOP_HOME/bin
 
 USER root
 RUN apt-get update && \
-    apt-get install -y scala && \
+    apt-get install -y scala python3 python3-dev apt-utils && \
     apt-get clean
 
 # download and condfigure Hadoop
@@ -33,10 +34,9 @@ RUN mkdir -p $SPARK_HOME/lib && cd $SPARK_HOME/lib && \
   curl -O http://central.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.7.3/hadoop-aws-2.7.3.jar && \
   curl -O http://central.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4.2/aws-java-sdk-1.7.4.2.jar
 
-EXPOSE 8888
-ENV IMAGE_NAME "spark"
+EXPOSE 8080 8081 4040 7077 7078
 
 COPY ./docker-entrypoint.sh /
 RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
+# ENTRYPOINT [ "/docker-entrypoint.sh" ]
 

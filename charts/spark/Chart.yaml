@@ -7,5 +7,5 @@ sources:
   - https://github.com/kubernetes/kubernetes/tree/master/examples/spark
   - https://github.com/apache/spark
 maintainers:
-  - name: Lachlan Evenson
-    email: lachlan.evenson@gmail.com
+  - name: Minh Mai
+    email: minh.v.mai@gmail.com

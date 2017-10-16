@@ -1,6 +1,6 @@
 FROM minh5/spark
 
-RUN apt-get install -y python3 python3-pip python3-dev
+RUN apt-get install -y python3-pip
 
 COPY ./requirements.txt root/
 
