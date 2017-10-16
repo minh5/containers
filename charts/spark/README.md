@@ -72,21 +72,6 @@ The following tables lists the configurable parameters of the Spark chart and th
 | `Worker.ExecutorMemory`      | Worker memory available for executor | `1g`                                                       |
 
 
-
-### Zeppelin
-
-|       Parameter         |           Description            |                         Default                          |
-|-------------------------|----------------------------------|----------------------------------------------------------|
-| `Zeppelin.Name`         | Zeppelin name                    | `zeppelin-controller`                                    |
-| `Zeppelin.Image`        | Container image name             | `gcr.io/google_containers/zeppelin`                      |
-| `Zeppelin.ImageTag`     | Container image tag              | `v0.5.5_v2`                                              |
-| `Zeppelin.Replicas`     | k8s deployment replicas          | `1`                                                      |
-| `Zeppelin.Component`    | k8s selector key                 | `zeppelin`                                               |
-| `Zeppelin.Cpu`          | container requested cpu          | `100m`                                                   |
-| `Zeppelin.ServicePort`  | k8s service port                 | `8080`                                                   |
-| `Zeppelin.ContainerPort`| Container listening port         | `8080`                                                   |
-
-
 Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`.
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,

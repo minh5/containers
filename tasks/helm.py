@@ -12,12 +12,12 @@ def init(ctx):
     ctx.run('helm init', echo=True)
 
 @task
-def add_repo(ctx):
+def configure(ctx):
     # helm lint <chart>
     # helm dep update <chart>
     # helm package <chart>
     # helm repo index . --url {gs url}
-    # gsutil-m rsync . gs://us.artifacts.upbeat-palace-178323.appspot.com
+    # gsutil-m rsync . $GS_REPO
     # helm repo update
     pass
 
