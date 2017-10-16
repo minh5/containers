@@ -1,4 +1,8 @@
+import os
+
 from invoke import task
+
+from .helm import _delete, _install
 
 DEFAULTS = {
     'MEM': 8192,
@@ -25,3 +29,29 @@ def start(ctx, driver='xhyve'):
 @task
 def stop(ctx):
     ctx.run('minikube stop', echo=True)
+
+@task
+def install(ctx, name):
+    if name == 'all':
+        for chart in os.listdir('~/sandbox/charts/'):
+            _install(ctx, chart)
+    else:
+        _install(ctx, name)
+
+@task
+def delete(ctx, name):
+    if name == 'all':
+        for chart in os.listdir('~/sandbox/charts/'):
+            _delete(ctx, chart)
+    else:
+        _delete(ctx, name)
+
+@task
+def reinstall(ctx, name):
+    if name == 'all':
+        for chart in os.listdir('~/sandbox/charts/'):
+            _delete(ctx, chart)
+            _install(ctx, chart)
+    else:
+        _delete(ctx, name)
+        _install(ctx, name)

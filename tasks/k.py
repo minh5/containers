@@ -36,3 +36,25 @@ def patch_sa(ctx):
 @task
 def add_to_firewall(ctx):
     pass
+
+def ls(ctx, pod):
+    ls = """
+        kubectl get po -o=name | awk -F '/' '{print $2}' | grep "%s"
+    """ % pod
+    return ctx.run(ls, echo=False, hide=True).stdout.split()
+
+@task
+def bash(ctx, pod):
+    pods = ls(ctx, pod)
+    if len(pods) > 1:
+        raise "Too many pods"
+    else:
+        ctx.run("kubectl exec -it %s /bin/bash" % pods[0], echo=True, pty=True)
+
+@task
+def logs(ctx, pod):
+    pods = ls(ctx, pod)
+    if len(pods) > 1:
+        raise "Too many pods"
+    else:
+        ctx.run("kubectl logs %s" % pods[0], echo=True, pty=True)

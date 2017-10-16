@@ -31,10 +31,6 @@ RUN cd $HADOOP_HOME/share/hadoop/common && \
   curl -O http://central.maven.org/maven2/org/apache/hadoop/hadoop-aws/2.7.3/hadoop-aws-2.7.3.jar && \
   curl -O http://central.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4.2/aws-java-sdk-1.7.4.2.jar
  
-COPY ./config/core-site.xml $HADOOP_HOME/etc/hadoop
-COPY ./config/hdfs-site.xml $HADOOP_HOME/etc/hadoop
-COPY ./config/slaves $HADOOP_HOME/etc/hadoop
-
 # Hdfs ports
 EXPOSE 50010 50020 50070 50075 50090 8020 9000
 # Mapred ports

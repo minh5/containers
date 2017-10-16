@@ -49,7 +49,7 @@ spec:
         command:
            - "/bin/bash"
            - "/tmp/hadoop-config/bootstrap.sh"
-           - "-d"
+           - "-datanode"
         resources:       
 {{ toYaml .Values.hdfs.dataNode.resources | indent 10 }}
         readinessProbe:

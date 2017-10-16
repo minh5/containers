@@ -25,7 +25,7 @@ Worker:
   Name: worker
   Image: minh5/spark
   ImageTag: latest
-  Replicas: 3
+  Replicas: 1
   Component: "spark-worker"
   Cpu: "100m"
   Memory: "512Mi"
