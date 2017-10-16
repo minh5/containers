@@ -39,7 +39,7 @@ The following tables lists the configurable parameters of the Hadoop chart and t
 
 | Parameter                                         | Description                                                                        | Default                                                          |
 | ------------------------------------------------- | -------------------------------                                                    | ---------------------------------------------------------------- |
-| `image`                                           | Hadoop image ([source](https://github.com/Comcast/kube-yarn/tree/master/image))    | `danisla/hadoop:{VERSION}`                                       |
+| `image`                                           | Hadoop image ([source](https://github.com/Comcast/kube-yarn/tree/master/image))    | `minh5/hadoop:{VERSION}`                                       |
 | `imagePullPolicy`                                 | Pull policy for the images                                                         | `IfNotPresent`                                                   |
 | `hadoopVersion`                                   | Version of hadoop libaries being used                                              | `{VERSION}`                                                      |
 | `antiAffinity`                                    | Pod antiaffinity, `hard` or `soft`                                                 | `hard`                                                           |
@@ -48,10 +48,7 @@ The following tables lists the configurable parameters of the Hadoop chart and t
 | `hdfs.dataNode.replicas`                          | Number of HDFS DataNode replicas                                                   | `1`                                                              |
 | `hdfs.dataNode.podMinAvailable`                   | PDB for HDFS DataNode                                                              | `1`                                                              |
 | `hdfs.dataNode.resources`                         | resources for the HDFS DataNode                                                    | `requests:memory=256Mi,cpu=10m,limits:memory=2048Mi,cpu=1000m`   |
-| `yarn.resourceManager.pdbMinAvailable`            | PDB for the YARN ResourceManager                                                   | `1`                                                              |
 | `yarn.resourceManager.resources`                  | resources for the YARN ResourceManager                                             | `requests:memory=256Mi,cpu=10m,limits:memory=2048Mi,cpu=1000m`   |
-| `yarn.nodeManager.pdbMinAvailable`                | PDB for the YARN NodeManager                                                       | `1`                                                              |
-| `yarn.nodeManager.replicas`                       | Number of YARN NodeManager replicas                                                | `2`                                                              |
 | `yarn.nodeManager.parallelCreate`                 | Create all nodeManager statefulset pods in parallel (K8S 1.7+)                     | `false`                                                          |
 | `yarn.nodeManager.resources`                      | Resource limits and requests for YARN NodeManager pods                             | `requests:memory=2048Mi,cpu=1000m,limits:memory=2048Mi,cpu=1000m`|
 | `persistence.nameNode.enabled`                    | Enable/disable persistent volume                                                   | `false`                                                          | 
@@ -62,14 +59,6 @@ The following tables lists the configurable parameters of the Hadoop chart and t
 | `persistence.dataNode.storageClass`               | Name of the StorageClass to use per your volume provider                           | `-`                                                              |
 | `persistence.dataNode.accessMode`                 | Access mode for the volume                                                         | `ReadWriteOnce`                                                  |
 | `persistence.dataNode.size`                       | Size of the volume                                                                 | `200Gi`                                                          |
-
-## Related charts
-
-The [Zeppelin Notebook](https://github.com/kubernetes/charts/tree/master/stable/zeppelin) chart can use the hadoop config for the hadoop cluster and use the YARN executor:
-
-```
-helm install --set hadoop.useConfigMap=true stable/zeppelin
-```
 
 # References
 
