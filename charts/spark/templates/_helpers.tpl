@@ -11,16 +11,16 @@ Create fully qualified names.
 We truncate at 24 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 */}}
 {{- define "master-fullname" -}}
-{{- $name := default .Chart.Name .Values.Master.Name -}}
+{{- $name := default .Chart.Name .Values.master.name -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 24 -}}
 {{- end -}}
 
 {{- define "webui-fullname" -}}
-{{- $name := default .Chart.Name .Values.WebUi.Name -}}
+{{- $name := default .Chart.Name .Values.webUi.name -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 24 -}}
 {{- end -}}
 
 {{- define "worker-fullname" -}}
-{{- $name := default .Chart.Name .Values.Worker.Name -}}
+{{- $name := default .Chart.Name .Values.worker.name -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 24 -}}
 {{- end -}}

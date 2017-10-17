@@ -6,13 +6,13 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    component: "{{ .Release.Name }}-{{ .Values.Master.Component }}"
+    component: "{{ .Release.Name }}-{{ .Values.master.component }}"
 spec:
   ports:
-    - port: {{ .Values.Master.ServicePort }}
-      targetPort: {{ .Values.Master.ContainerPort }}
+    - port: {{ .Values.master.servicePort }}
+      targetPort: {{ .Values.master.containerPort }}
   selector:
-    component: "{{ .Release.Name }}-{{ .Values.Master.Component }}"
+    component: "{{ .Release.Name }}-{{ .Values.master.component }}"
 ---
 apiVersion: v1
 kind: Service
@@ -22,13 +22,13 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    component: "{{ .Release.Name }}-{{ .Values.Master.Component }}"
+    component: "{{ .Release.Name }}-{{ .Values.master.component }}"
 spec:
   ports:
-    - port: {{ .Values.WebUi.ServicePort }}
-      targetPort: {{ .Values.WebUi.ContainerPort }}
+    - port: {{ .Values.webUi.servicePort }}
+      targetPort: {{ .Values.webUi.containerPort }}
   selector:
-    component: "{{ .Release.Name }}-{{ .Values.Master.Component }}"
+    component: "{{ .Release.Name }}-{{ .Values.master.component }}"
   type: "LoadBalancer"
 ---
 apiVersion: extensions/v1beta1
@@ -39,21 +39,21 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    component: "{{ .Release.Name }}-{{ .Values.Master.Component }}"
+    component: "{{ .Release.Name }}-{{ .Values.master.component }}"
 spec:
-  replicas: {{ default 1 .Values.Master.Replicas }}
+  replicas: {{ default 1 .Values.master.replicas }}
   strategy:
     type: RollingUpdate
   selector:
     matchLabels:
-      component: "{{ .Release.Name }}-{{ .Values.Master.Component }}"
+      component: "{{ .Release.Name }}-{{ .Values.master.component }}"
   template:
     metadata:
       labels:
         heritage: {{ .Release.Service | quote }}
         release: {{ .Release.Name | quote }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        component: "{{ .Release.Name }}-{{ .Values.Master.Component }}"
+        component: "{{ .Release.Name }}-{{ .Values.master.component }}"
     spec:
       containers:
         - name: {{ template "master-fullname" . }}
@@ -63,13 +63,13 @@ spec:
              - "/tmp/config/bootstrap.sh"
              - "-master"
           ports:
-            - containerPort: {{ .Values.Master.ContainerPort }}
-            - containerPort: {{ .Values.WebUi.ContainerPort }}
+            - containerPort: {{ .Values.master.containerPort }}
+            - containerPort: {{ .Values.webUi.containerPort }}
           resources:
             requests:
-              cpu: "{{ .Values.Master.Cpu }}"
-              memory: "{{ .Values.Master.Memory }}"
+              cpu: "{{ .Values.master.cpu }}"
+              memory: "{{ .Values.master.memory }}"
           env:
           - name: SPARK_DAEMON_MEMORY
-            value: {{ default "1g" .Values.Master.DaemonMemory | quote }}
+            value: {{ default "1g" .Values.master.daemonMemory | quote }}
 {{ include "common_deployment" . }}

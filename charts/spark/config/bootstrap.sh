@@ -36,11 +36,9 @@ case "$1" in
         /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://${SPARK_MASTER_HOST}:7077 --webui-port 8081
         ;;
     -notebook)
-        useradd -m -s /bin/bash -N -u 1000 user
-        USER_HOME="/home/user"
-        groupadd supergroup
-        usermod -a -G supergroup user
-        pip install --no-cache -r ${CONFIG_DIR}/requirements.txt
+        chmod +x $CONFIG_DIR/notebook.sh
+        $CONFIG_DIR/notebook.sh
+        pip3 install --no-cache -r ${CONFIG_DIR}/requirements.txt
         jupyter nbextensions_configurator enable --user
         jupyter contrib nbextension install --user
         jupyter nbextension enable codefolding/main

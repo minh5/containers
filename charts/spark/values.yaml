@@ -4,35 +4,32 @@
 # name: value
 global:
   image: minh5/spark
-  imageTag: 0.0.2
+  imageTag: latest
   pullPolicy: IfNotPresent
-Master:
-  Name: master
-  Replicas: 1
-  Component: "spark-master"
-  Cpu: "100m"
-  Memory: "512Mi"
-  ServicePort: 7077
-  ContainerPort: 7077
-  # Set Master JVM memory. Default 1g
-  DaemonMemory: 1g
-
-WebUi:
-  Name: webui
-  ServicePort: 8080
-  ContainerPort: 8080
-
-Worker:
-  Name: worker
-  Replicas: 1
-  Component: "spark-worker"
-  Cpu: "100m"
-  Memory: "512Mi"
-  ContainerPort: 8081
+master:
+  name: master
+  replicas: 1
+  component: "spark-master"
+  cpu: "100m"
+  memory: "512Mi"
+  servicePort: 7077
+  containerPort: 7077
+  daemonMemory: 1g
+webUi:
+  name: webui
+  servicePort: 8080
+  containerPort: 8080
+worker:
+  name: worker
+  replicas: 1
+  component: "spark-worker"
+  cpu: "100m"
+  memory: "512Mi"
+  containerPort: 8081
   # Set Worker JVM memory. Default 1g
-  DaemonMemory: 1g
+  daemonMemory: 1g
   # Set how much total memory workers have to give executors
-  ExecutorMemory: 1g
+  executorMemory: 1g
 driver:
   memory: 4g
 executor:

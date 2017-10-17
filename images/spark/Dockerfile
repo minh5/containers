@@ -35,8 +35,3 @@ RUN mkdir -p $SPARK_HOME/lib && cd $SPARK_HOME/lib && \
   curl -O http://central.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4.2/aws-java-sdk-1.7.4.2.jar
 
 EXPOSE 8080 8081 4040 7077 7078
-
-COPY ./docker-entrypoint.sh /
-RUN chmod +x /docker-entrypoint.sh
-# ENTRYPOINT [ "/docker-entrypoint.sh" ]
-
