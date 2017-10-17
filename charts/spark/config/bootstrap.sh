@@ -2,11 +2,11 @@
 
 : ${SPARK_PREFIX:=/opt/spark}
 # Directory to find config artifacts
-CONFIG_DIR="/tmp/spark-config"
+CONFIG_DIR="/tmp/config"
 
 
 # Copy spark config files
-for f in slaves core-site.xml hdfs-site.xml spark-env.sh; do
+for f in slaves core-site.xml hdfs-site.xml spark-env.sh log4j.properties spark-defaults.conf; do
   if [[ -e ${CONFIG_DIR}/$f ]]; then
     cp ${CONFIG_DIR}/$f $SPARK_CONF_DIR/$f
   else
@@ -26,7 +26,7 @@ case "$1" in
         /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master --ip $SPARK_MASTER_HOST --port 7077 --webui-port 8080
         ;;
     -worker)
-        if ! getent hosts $SPARK_MASTER_HOST; then
+        if ! getent hosts $SPARK_MASTER_SERVICE_HOST; then
           echo "=== Cannot resolve the DNS entry for spark-master. Has the service been created yet, and is SkyDNS functional?"
           echo "=== See http://kubernetes.io/v1.1/docs/admin/dns.html for more details on DNS integration."
           echo "=== Sleeping 10s before pod exit."

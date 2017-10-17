@@ -25,7 +25,10 @@ spec:
       containers:
         - name: {{ template "worker-fullname" . }}
           image: "{{ .Values.Worker.Image }}:{{ .Values.Worker.ImageTag }}"
-          command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://{{ template "master-fullname" . }}:{{ .Values.Master.ServicePort }}", "--webui-port", "{{ .Values.Worker.ContainerPort }}"]
+          command:
+             - "/bin/bash"
+             - "/tmp/config/bootstrap.sh"
+             - "-worker"
           ports:
             - containerPort: {{ .Values.Worker.ContainerPort }}
           resources:
@@ -37,3 +40,4 @@ spec:
             value: {{ default "1g" .Values.Worker.DaemonMemory | quote }}
           - name: SPARK_WORKER_MEMORY
             value: {{ default "1g" .Values.Worker.ExecutorMemory | quote }}
+{{ include "common_deployment" . }}
