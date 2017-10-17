@@ -6,7 +6,7 @@
 Master:
   Name: master
   Image: minh5/spark
-  ImageTag: latest
+  ImageTag: 0.0.2
   Replicas: 1
   Component: "spark-master"
   Cpu: "100m"
