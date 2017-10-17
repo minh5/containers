@@ -57,7 +57,7 @@ spec:
     spec:
       containers:
         - name: {{ template "master-fullname" . }}
-          image: "{{ .Values.Master.Image }}:{{ .Values.Master.ImageTag }}"
+          image: "{{ .Values.global.image }}:{{ .Values.global.imageTag }}"
           command:
              - "/bin/bash"
              - "/tmp/config/bootstrap.sh"

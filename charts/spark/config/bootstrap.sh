@@ -40,6 +40,7 @@ case "$1" in
         USER_HOME="/home/user"
         groupadd supergroup
         usermod -a -G supergroup user
+        pip install --no-cache -r ${CONFIG_DIR}/requirements.txt
         jupyter nbextensions_configurator enable --user
         jupyter contrib nbextension install --user
         jupyter nbextension enable codefolding/main
@@ -51,11 +52,6 @@ case "$1" in
         else
           echo "ERROR: Could not find jupyter_notebook_config.py in $CONFIG_DIR"
           exit 1
-        fi
-        if [[ -e ${CONFIG_DIR}/requirements.txt ]]; then
-          if [[ -s ${CONFIG_DIR}/requirements.txt ]]; then
-            pip install --no-cache -r ${CONFIG_DIR}/requirements.txt
-          fi
         fi
         export PYSPARK_DRIVER_PYTHON=jupyter
         export PYSPARK_DRIVER_PYTHON_OPTS 'notebook'

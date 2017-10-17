@@ -2,11 +2,12 @@
 # This is a YAML-formatted file.
 # Declare name/value pairs to be passed into your templates.
 # name: value
-
+global:
+  image: minh5/spark
+  imageTag: 0.0.2
+  pullPolicy: IfNotPresent
 Master:
   Name: master
-  Image: minh5/spark
-  ImageTag: 0.0.2
   Replicas: 1
   Component: "spark-master"
   Cpu: "100m"
@@ -23,8 +24,6 @@ WebUi:
 
 Worker:
   Name: worker
-  Image: minh5/spark
-  ImageTag: 0.0.2
   Replicas: 1
   Component: "spark-worker"
   Cpu: "100m"
@@ -38,3 +37,14 @@ driver:
   memory: 4g
 executor:
   memory: 4g
+notebook:
+  url: /pyspark
+  service:
+    type: ClusterIP
+    externalPort: 8888
+    internalPort: 8888
+persistence:
+  enabled: true
+  storageClass: generic
+  accessMode: ReadWriteOnce
+  size: 8Gi

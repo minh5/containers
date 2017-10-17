@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: {{ template "worker-fullname" . }}
-          image: "{{ .Values.Worker.Image }}:{{ .Values.Worker.ImageTag }}"
+          image: "{{ .Values.global.image }}:{{ .Values.global.imageTag }}"
           command:
              - "/bin/bash"
              - "/tmp/config/bootstrap.sh"

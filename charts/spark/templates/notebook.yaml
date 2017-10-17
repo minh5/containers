@@ -1,0 +1,63 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}-pyspark-notebook"
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: "{{ .Release.Name }}-pyspark-notebook"
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.global.image }}:{{ .Values.global.imageTag }}"
+          imagePullPolicy: {{ .Values.global.pullPolicy }}
+          command:
+            - "/bin/bash"
+            - "/tmp/config/bootstrap.sh"
+            - "-notebook"
+          ports:
+            - containerPort: {{ .Values.notebook.service.internalPort }}
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+{{ include "common_deployment" . }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ .Release.Name }}-pyspark-notebook"
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+spec:
+  type: {{ .Values.notebook.service.type }}
+  ports:
+  - port: {{ .Values.notebook.service.externalPort }}
+    targetPort: {{ .Values.notebook.service.internalPort }}
+    protocol: TCP
+  selector:
+    app: "{{ .Release.Name }}-pyspark-notebook"
+
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: "{{ .Release.Name }}-pyspark-notebook"
+  labels:
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.global.ingressClass | default "nginx" | quote }}
+spec:
+  rules:
+  - http:
+      paths:
+      - path: {{ .Values.notebook.url }}
+        backend:
+          serviceName: "{{ .Release.Name }}-pyspark-notebook"
+          servicePort: {{ .Values.notebook.service.externalPort }}
