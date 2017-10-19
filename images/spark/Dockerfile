@@ -27,4 +27,3 @@ RUN mkdir -p $SPARK_HOME/lib && \
   
 EXPOSE 8080 8081 4040 7077 7078
 
-
