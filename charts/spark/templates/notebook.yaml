@@ -9,7 +9,7 @@ spec:
   template:
     metadata:
       labels:
-        app: "{{ .Release.Name }}-pyspark-notebook"
+        app: "{{ .Release.Name }}-notebook"
     spec:
       containers:
         - name: {{ .Chart.Name }}

@@ -6,7 +6,7 @@ CONFIG_DIR="/tmp/config"
 
 
 # Copy spark config files
-for f in slaves core-site.xml hdfs-site.xml spark-env.sh log4j.properties spark-defaults.conf; do
+for f in spark-env.sh log4j.properties spark-defaults.conf; do
   if [[ -e ${CONFIG_DIR}/$f ]]; then
     cp ${CONFIG_DIR}/$f $SPARK_CONF_DIR/$f
   else
@@ -36,6 +36,7 @@ case "$1" in
         /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://${SPARK_MASTER_HOST}:7077 --webui-port 8081
         ;;
     -notebook)
+        USER_HOME="/home/user"
         chmod +x $CONFIG_DIR/notebook.sh
         $CONFIG_DIR/notebook.sh
         pip3 install --no-cache -r ${CONFIG_DIR}/requirements.txt
@@ -53,10 +54,10 @@ case "$1" in
         fi
         export PYSPARK_DRIVER_PYTHON=jupyter
         export PYSPARK_DRIVER_PYTHON_OPTS 'notebook'
-        export SPARK_OPTS=--driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
+        # export SPARK_OPTS=--driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
         export PYSPARK_PYTHON=ipython
         # tini -s -- pyspark --master spark://${SPARK_MASTER_HOST}:7077
-        gosu user:supergroup bash -c 'tini -s -- pyspark --master spark://${SPARK_MASTER_HOST}:7077'
+        gosu user:supergroup bash -c 'tini -s -- /opt/spark/bin/pyspark --master spark://${SPARK_MASTER_HOST}:7077'
         ;;
     -bash)
         bash "${@:2}"

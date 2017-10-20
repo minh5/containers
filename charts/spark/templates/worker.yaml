@@ -6,34 +6,38 @@ metadata:
     heritage: {{ .Release.Service | quote }}
     release: {{ .Release.Name | quote }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-    component: "{{ .Release.Name }}-{{ .Values.Worker.Component }}"
+    component: "{{ .Release.Name }}-{{ .Values.worker.component }}"
 spec:
-  replicas: {{ default 1 .Values.Worker.Replicas }}
+  replicas: {{ default 1 .Values.worker.replicas }}
   strategy:
     type: RollingUpdate
   selector:
     matchLabels:
-      component: "{{ .Release.Name }}-{{ .Values.Worker.Component }}"
+      component: "{{ .Release.Name }}-{{ .Values.worker.component }}"
   template:
     metadata:
       labels:
         heritage: {{ .Release.Service | quote }}
         release: {{ .Release.Name | quote }}
         chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
-        component: "{{ .Release.Name }}-{{ .Values.Worker.Component }}"
+        component: "{{ .Release.Name }}-{{ .Values.worker.component }}"
     spec:
       containers:
         - name: {{ template "worker-fullname" . }}
-          image: "{{ .Values.Worker.Image }}:{{ .Values.Worker.ImageTag }}"
-          command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.worker.Worker", "spark://{{ template "master-fullname" . }}:{{ .Values.Master.ServicePort }}", "--webui-port", "{{ .Values.Worker.ContainerPort }}"]
+          image: "{{ .Values.global.image }}:{{ .Values.global.imageTag }}"
+          command:
+             - "/bin/bash"
+             - "/tmp/config/bootstrap.sh"
+             - "-worker"
           ports:
-            - containerPort: {{ .Values.Worker.ContainerPort }}
+            - containerPort: {{ .Values.worker.containerPort }}
           resources:
             requests:
-              cpu: "{{ .Values.Worker.Cpu }}"
-              memory: "{{ .Values.Worker.Memory }}"
+              cpu: "{{ .Values.worker.cpu }}"
+              memory: "{{ .Values.worker.memory }}"
           env:
           - name: SPARK_DAEMON_MEMORY
-            value: {{ default "1g" .Values.Worker.DaemonMemory | quote }}
+            value: {{ default "1g" .Values.worker.daemonMemory | quote }}
           - name: SPARK_WORKER_MEMORY
-            value: {{ default "1g" .Values.Worker.ExecutorMemory | quote }}
+            value: {{ default "1g" .Values.worker.executorMemory | quote }}
+{{ include "common_deployment" . }}

@@ -1,4 +1,4 @@
-dask
+# dask
 # gensim
 ipykernel
 ipywidgets         # via jupyter
@@ -13,7 +13,7 @@ numpy
 pandas
 setuptools
 sklearn
-spacy
+# spacy
 sqlalchemy
 # tensorflow
 # xgboost
