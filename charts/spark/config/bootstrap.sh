@@ -37,13 +37,14 @@ case "$1" in
         ;;
     -notebook)
         USER_HOME="/home/user"
-        chmod +x $CONFIG_DIR/notebook.sh
-        $CONFIG_DIR/notebook.sh
+        useradd -m -s /bin/bash -N -u 1000 user
+        groupadd supergroup
+        usermod -a -G supergroup user
         pip3 install --no-cache -r ${CONFIG_DIR}/requirements.txt
         jupyter nbextensions_configurator enable --user
         jupyter contrib nbextension install --user
         jupyter nbextension enable codefolding/main
-        jupyter nbextension enable --py widgetsnbextension --sys-prefix
+        # jupyter nbextension enable --py widgetsnbextension --sys-prefix
         if [[ -e ${CONFIG_DIR}/jupyter_notebook_config.py ]]; then
           mkdir -p $USER_HOME/.jupyter
           cp ${CONFIG_DIR}/jupyter_notebook_config.py $USER_HOME/.jupyter/
