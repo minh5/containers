@@ -1,5 +1,5 @@
-# dask
-# gensim
+dask
+gensim
 ipykernel
 ipywidgets         # via jupyter
 jupyter
@@ -8,12 +8,12 @@ jupyter_contrib_nbextensions
 jupyter-client    # via ipykernel, jupyter-console, notebook, qtconsole
 jupyter-console    # via jupyter
 jupyter-core     # via jupyter-client, nbconvert, nbformat, notebook, qtconsole
-# nltk
-# numpy
-# pandas
-# setuptools
-# sklearn
-# spacy
-# sqlalchemy
-# tensorflow
-# xgboost
+nltk
+numpy
+pandas
+setuptools
+sklearn
+spacy
+sqlalchemy
+tensorflow
+xgboost

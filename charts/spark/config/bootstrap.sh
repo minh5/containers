@@ -40,10 +40,10 @@ case "$1" in
         useradd -m -s /bin/bash -N -u 1000 user
         groupadd supergroup
         usermod -a -G supergroup user
-        # pip3 install --no-cache -r ${CONFIG_DIR}/requirements.txt
-        # jupyter nbextensions_configurator enable --user
-        # jupyter contrib nbextension install --user
-        # jupyter nbextension enable codefolding/main
+        pip3 install --no-cache -r ${CONFIG_DIR}/requirements.txt
+        jupyter nbextensions_configurator enable --user
+        jupyter contrib nbextension install --user
+        jupyter nbextension enable codefolding/main
         if [[ -e ${CONFIG_DIR}/jupyter_notebook_config.py ]]; then
           mkdir -p $USER_HOME/.jupyter
           cp ${CONFIG_DIR}/jupyter_notebook_config.py $USER_HOME/.jupyter/
@@ -52,10 +52,10 @@ case "$1" in
           echo "ERROR: Could not find jupyter_notebook_config.py in $CONFIG_DIR"
           exit 1
         fi
-        # export PYSPARK_DRIVER_PYTHON=jupyter
-        # export PYSPARK_DRIVER_PYTHON_OPTS 'notebook'
-        # export PYSPARK_PYTHON=ipython
-        # gosu user:supergroup bash -c 'tini -s -- /opt/spark/bin/pyspark --master spark://${SPARK_MASTER_HOST}:7077'
+        export PYSPARK_DRIVER_PYTHON=jupyter
+        export PYSPARK_DRIVER_PYTHON_OPTS=notebook
+        export PYSPARK_PYTHON=ipython
+        gosu user:supergroup bash -c 'tini -s -- /opt/spark/bin/pyspark --master spark://${SPARK_MASTER_HOST}:7077'
         ;;
     -bash)
         bash "${@:2}"

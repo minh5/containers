@@ -29,6 +29,8 @@ def start(ctx,  name='sandbox'):
         project=DEFAULTS['PROJECT'],
     )
     ctx.run(cmd, echo=True)
+    ctx.run('helm init', echo=True, hide=False)
+
 
 def get_cluster_name(ctx):
     stdout = ctx.run('gcloud alpha container clusters list').stdout
