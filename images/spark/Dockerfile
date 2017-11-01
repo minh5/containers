@@ -13,7 +13,7 @@ ENV GOSU_VERSION      1.10
 USER root
 
 RUN apt-get update && \
-    apt-get install -y scala python python-dev python-pip python3 python3-dev python3-pip apt-utils && \
+    apt-get install -y scala python python-dev python-pip python3 python3-dev python3-pip apt-utils git && \
     apt-get clean
 
 # download and configure Spark

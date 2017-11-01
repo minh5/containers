@@ -36,22 +36,10 @@ case "$1" in
         /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://${SPARK_MASTER_HOST}:7077 --webui-port 8081
         ;;
     -notebook)
-        USER_HOME="/home/user"
-        useradd -m -s /bin/bash -N -u 1000 user
-        groupadd supergroup
-        usermod -a -G supergroup user
-        pip3 install --no-cache -r ${CONFIG_DIR}/requirements.txt
-        jupyter nbextensions_configurator enable --user
-        jupyter contrib nbextension install --user
-        jupyter nbextension enable codefolding/main
-        if [[ -e ${CONFIG_DIR}/jupyter_notebook_config.py ]]; then
-          mkdir -p $USER_HOME/.jupyter
-          cp ${CONFIG_DIR}/jupyter_notebook_config.py $USER_HOME/.jupyter/
-          chown -R user $USER_HOME && cd $USER_HOME
-        else
-          echo "ERROR: Could not find jupyter_notebook_config.py in $CONFIG_DIR"
-          exit 1
-        fi
+        for f in user.sh jupyter.sh; do
+          chmod +x ${CONFIG_DIR}/$f
+          ${CONFIG_DIR}/$f
+        done
         export PYSPARK_DRIVER_PYTHON=jupyter
         export PYSPARK_DRIVER_PYTHON_OPTS=notebook
         export PYSPARK_PYTHON=ipython
