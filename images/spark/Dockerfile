@@ -36,7 +36,7 @@ RUN arch="$(dpkg --print-architecture | awk -F- '{ print $NF }')" && \
     gosu nobody true
 
 #install tini
-RUN wget -O https://github.com/krallin/tini/releases/download/v0.16.1/tini && \
+RUN wget https://github.com/krallin/tini/releases/download/v0.16.1/tini && \
     chmod +x tini && \
     mv tini /bin
 
