@@ -1,0 +1,75 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "worker-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-{{ .Values.worker.component }}"
+spec:
+  ports:
+    - port: {{ .Values.worker.servicePort }}
+      targetPort: {{ .Values.worker.containerPort }}
+  selector:
+    component: "{{ .Release.Name }}-{{ .Values.worker.component }}"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "webui-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-{{ .Values.worker.component }}"
+spec:
+  ports:
+    - port: {{ .Values.webUi.workerUi.servicePort }}
+      targetPort: {{ .Values.webUi.workerUi.containerPort }}
+  selector:
+    component: "{{ .Release.Name }}-{{ .Values.worker.component }}"
+  type: "LoadBalancer"
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "worker-fullname" . }}
+  labels:
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    component: "{{ .Release.Name }}-{{ .Values.worker.component }}"
+spec:
+  replicas: {{ default 1 .Values.worker.replicas }}
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      component: "{{ .Release.Name }}-{{ .Values.worker.component }}"
+  template:
+    metadata:
+      labels:
+        heritage: {{ .Release.Service | quote }}
+        release: {{ .Release.Name | quote }}
+        chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+        component: "{{ .Release.Name }}-{{ .Values.worker.component }}"
+    spec:
+      containers:
+        - name: {{ template "worker-fullname" . }}
+          image: "{{ .Values.global.image }}:{{ .Values.global.imageTag }}"
+          command:
+             - "/bin/bash"
+             - "/tmp/config/bootstrap.sh"
+             - "-worker"
+          ports:
+            - containerPort: {{ .Values.worker.containerPort }}
+            - containerPort: {{ .Values.webUi.workerUi.containerPort }}
+          resources:
+            requests:
+              cpu: "{{ .Values.worker.cpu }}"
+              memory: "{{ .Values.worker.memory }}"
+          env:
+          - name: KUDU_MASTER
+            value: {{ .Values.worker.kuduMaster }}
+{{ include "common_deployment" . }}
