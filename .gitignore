@@ -1,3 +1,5 @@
 .vscode
 *.pyc
 sandbox-c91ea600c70f.json
+.idea/*
+*/.DS_Store
