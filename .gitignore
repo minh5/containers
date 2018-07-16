@@ -3,3 +3,5 @@
 sandbox-c91ea600c70f.json
 .idea/*
 */.DS_Store
+*/.ipynb_checkpoints
+*/dask-worker-space
