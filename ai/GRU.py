@@ -38,9 +38,10 @@ def preprocess_dataframe(data):
     pos_corpus['stopper'] = 9
     data['word'] = data.word.apply(lambda x: corpus[x])
     data['pos'] = data.pos.apply(lambda x: pos_corpus[x])
+    del pos_corpus['stopper']
     return corpus, pos_corpus, data
 
-def determine_max_length(data):
+def determine_max_length(data, idx):
     array = [0] + idx + [data.shape[0]]
     start = 0
     max_num = 0
@@ -56,70 +57,68 @@ def create_sentence_vectors(data):
     words = np.empty([122, ])
     pos = np.empty([122, ])
     start = 0
-    max_length = determine_max_length(data)
+    max_length = determine_max_length(data, idx)
     for i in idx:
-        _words = data.loc[start:i, 'word'].values
-        _pos = data.loc[start:i, 'pos'].values
+        _words = data.loc[start:(i-1), 'word'].values
+        _pos = data.loc[start:(i-1), 'pos'].values
         start = i + 1
         words = np.vstack((words, np.hstack((_words, np.zeros(max_length - len(_words))))))
         pos = np.vstack((pos, np.hstack((_pos, np.zeros(max_length - len(_pos))))))
-    return words, pos
+    return words, pos, idx
 
 
 corpus, pos_corpus, data = preprocess_dataframe(raw)
-words, pos = create_sentence_vectors(data)
+words, pos, idx = create_sentence_vectors(data)
+max_length = determine_max_length(data, idx)
+num_output_classes = len(pos_corpus)
+num_input_classes = len(corpus)
 
-pos[0]
-# array([4., 1., 3., 3., 1., 2., 1., 3., 3., 3., 2., 2., 1., 4., 1., 2., 3.,
-#        2., 3., 1., 1., 2., 4., 4., 4., 1., 3., 4., 9., 0., 0., 0., 0., 0.,
-#        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-#        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-#        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-#        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-#        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
-#        0., 0., 0.])
+encoder_input_data = np.zeros(
+    (len(words), max_length, num_input_classes) + 1),
+    dtype='float32')
+decoder_input_data = np.zeros(
+    (len(pos), max_length, num_output_classes + 1),
+    dtype='float32')
+decoder_target_data = np.zeros(
+    (len(pos), max_length, num_output_classes + 1),
+    dtype='float32')
 
-words[3]
-# array([52., 53., 54., 55., 56., 15., 48., 44., 57., 58., 59.,  2., 34.,
-#        30., 60.,  7., 61., 62., 63., 43., 64.,  1., 65., 66., 67., 68.,
-#        69., 70., 33.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-#         0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
-#         0.,  0.,  0.,  0.,  0.])
+try:
+    for i, (word, tag) in enumerate(zip(words, pos)):
+        for t, char in enumerate(word):
+            encoder_input_data[i, t, int(char)] = 1.
+        for t, char in enumerate(tag):
+            # decoder_target_data is ahead of decoder_input_data by one timestep
+            decoder_input_data[i, t, int(char)] = 1.
+            if t > 0:
+                # decoder_target_data will be ahead by one timestep
+                # and will not include the start character.
+                decoder_target_data[i, t - 1, int(char)] = 1.
+except:
+    import pdb; pdb.post_mortem()
+    
 
-# training models
+# actually training
 batch_size = 64  # Batch size for training.
-epochs = 5  # Number of epochs to train for.
+epochs = 10  # Number of epochs to train for.
 latent_dim = 256  # Latent dimensionality of the encoding space.
-num_samples = 10000  # Number of samples to train on.
-num_tokens = determine_max_length(data)
-max_length = determine_max_length(data)
 
-encoder_inputs = Input(shape=(None, num_tokens))
+encoder_inputs = Input(shape=(max_length, num_input_classes + 1))
 encoder = GRU(latent_dim, return_state=True)
 encoder_outputs, state_h = encoder(encoder_inputs)
 
-decoder_inputs = Input(shape=(None, num_tokens))
+decoder_inputs = Input(shape=(max_length, num_output_classes + 1))
 decoder_gru = GRU(latent_dim, return_sequences=True)
 decoder_outputs = decoder_gru(decoder_inputs, initial_state=state_h)
-decoder_dense = Dense(num_tokens, activation='softmax')
+decoder_dense = Dense(num_output_classes + 1, activation='softmax')
 decoder_outputs = decoder_dense(decoder_outputs)
 model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
-
 model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
 model.fit(
-    words,
-    pos,
+    [encoder_input_data, decoder_input_data],
+    decoder_target_data,
     batch_size=batch_size,
     epochs=epochs,
     validation_split=0.2
 )
-# ValueError: Error when checking model input: the list of Numpy arrays that you are passing to your model is not the size the model expected. Expected to see 2 array(s), but instead got the following list of 1 arrays: [array([[  0.,   1.,   1., ...,   0.,   0.,   0.],
-#        [  0.,   1.,   2., ...,   0.,   0.,   0.],
-#        [ 34.,  35.,   2., ...,   0.,   0.,   0.],
-#        ...,
-#        [699., 885., 886., ...,   0., ...
+
