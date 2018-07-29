@@ -4,8 +4,8 @@ import dask.dataframe as dd
 import numpy as np
 import pandas as pd
 
-from keras.models import Model
-from keras.layers import Input, LSTM, Dense, GRU
+from keras.models import Model, Sequential
+from keras.layers import Input, LSTM, GRU
 
 raw = pd.read_table('/Users/minhmai/Downloads/train.txt', delimiter=' ', header=None)
 raw.columns = ['word', 'pos', 'wsj']
@@ -34,12 +34,13 @@ def preprocess_dataframe(data):
     data = data[['word', 'pos']]
     data['word'] = data.word.apply(lambda x: x.lower())
     corpus = {k: v for k, v in zip(data['word'].unique(), range(data['word'].nunique()))}
-    pos_corpus = {k: v for k, v in zip(data['pos'].unique(), range(1, data['pos'].nunique())) if v != 'stopper'}
+    pos_corpus = {k: v for k, v in zip(data['pos'].unique(), range(data['pos'].nunique())) if v != 'stopper'}
     pos_corpus['stopper'] = 9
     data['word'] = data.word.apply(lambda x: corpus[x])
     data['pos'] = data.pos.apply(lambda x: pos_corpus[x])
     del pos_corpus['stopper']
     return corpus, pos_corpus, data
+
 
 def determine_max_length(data, idx):
     array = [0] + idx + [data.shape[0]]
@@ -52,7 +53,8 @@ def determine_max_length(data, idx):
         start = i
     return max_num
 
-def create_sentence_vectors(data):
+
+def create_assets(data):
     idx = data.loc[data['pos'] == 9, :].index.values.tolist()
     words = np.empty([122, ])
     pos = np.empty([122, ])
@@ -67,58 +69,66 @@ def create_sentence_vectors(data):
     return words, pos, idx
 
 
-corpus, pos_corpus, data = preprocess_dataframe(raw)
-words, pos, idx = create_sentence_vectors(data)
-max_length = determine_max_length(data, idx)
-num_output_classes = len(pos_corpus)
-num_input_classes = len(corpus)
-
-encoder_input_data = np.zeros(
-    (len(words), max_length, num_input_classes) + 1),
-    dtype='float32')
-decoder_input_data = np.zeros(
-    (len(pos), max_length, num_output_classes + 1),
-    dtype='float32')
-decoder_target_data = np.zeros(
-    (len(pos), max_length, num_output_classes + 1),
-    dtype='float32')
-
-try:
-    for i, (word, tag) in enumerate(zip(words, pos)):
+def create_nn_assets(words_data, word_corpus, pos_corpus):
+    # ensures all vector length for sentences are the same length
+    assert(len(set([len(d) for d in words_data])) == 1)
+    sentence_length = len(words_data)
+    max_sentence_length = len(words_data[0])
+    max_word_length = len(str("{0:b}".format(len(word_corpus))))
+    input_data = np.zeros(
+        (
+            sentence_length, # denotes sentence
+            max_sentence_length, # denotes word position
+            max_word_length # denotes actual word
+        ),
+        dtype='float32'
+    )
+    target_data = np.zeros(
+        (
+            sentence_length,
+            max_sentence_length,
+            len(pos_corpus),
+        ),
+    dtype='float32'
+    )
+    for i, (word, tag) in enumerate(zip(words_data, pos)):
         for t, char in enumerate(word):
-            encoder_input_data[i, t, int(char)] = 1.
+            binary = "{0:b}".format(int(char)).zfill(max_word_length)
+            input_data[i, t, :] = [i for i in binary]
         for t, char in enumerate(tag):
-            # decoder_target_data is ahead of decoder_input_data by one timestep
-            decoder_input_data[i, t, int(char)] = 1.
-            if t > 0:
-                # decoder_target_data will be ahead by one timestep
-                # and will not include the start character.
-                decoder_target_data[i, t - 1, int(char)] = 1.
-except:
-    import pdb; pdb.post_mortem()
+            target_data[i, t, int(char)] = 1.
+    return input_data, target_data
     
+
+# preprocessing data
+corpus, pos_corpus, data = preprocess_dataframe(raw)
+words, pos, idx = create_assets(data)
+x, y = create_nn_assets(words, corpus, pos_corpus)
+print('shape of x:', x.shape)
+print('shape of y:', x.shape)
+
+# shape of x: (8828, 122, 15)
+# shape of y: (8828, 122, 15)
 
 # actually training
 batch_size = 64  # Batch size for training.
-epochs = 10  # Number of epochs to train for.
-latent_dim = 256  # Latent dimensionality of the encoding space.
+epochs = 2 # Number of epochs to train for.
+latent_dim = 4  # Latent dimensionality of the encoding space.
+sentence_length = len(words[0]) # length of the words in a sentence (time step)
+num_outputs = len(pos_corpus)
+output_shape = len(x[0][0]) # base 2 binary represented as an array for each number (input dimensino)
 
-encoder_inputs = Input(shape=(max_length, num_input_classes + 1))
-encoder = GRU(latent_dim, return_state=True)
-encoder_outputs, state_h = encoder(encoder_inputs)
-
-decoder_inputs = Input(shape=(max_length, num_output_classes + 1))
-decoder_gru = GRU(latent_dim, return_sequences=True)
-decoder_outputs = decoder_gru(decoder_inputs, initial_state=state_h)
-decoder_dense = Dense(num_output_classes + 1, activation='softmax')
-decoder_outputs = decoder_dense(decoder_outputs)
-model = Model([encoder_inputs, decoder_inputs], decoder_outputs)
+model = Sequential()
+model.add(GRU(4, input_shape=(max_length, output_shape)))
 model.compile(optimizer='rmsprop', loss='categorical_crossentropy')
 model.fit(
-    [encoder_input_data, decoder_input_data],
-    decoder_target_data,
+    x,
+    y,
     batch_size=batch_size,
     epochs=epochs,
     validation_split=0.2
 )
+
+# ValueError: Error when checking target: expected gru_22 to have 2 dimensions, but got array with shape (8828, 122, 4)
+
 
