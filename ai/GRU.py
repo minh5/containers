@@ -112,10 +112,14 @@ print('shape of y:', x.shape)
 # actually training
 batch_size = 64  # Batch size for training.
 epochs = 2 # Number of epochs to train for.
-latent_dim = 4  # Latent dimensionality of the encoding space.
-sentence_length = len(words[0]) # length of the words in a sentence (time step)
-num_outputs = len(pos_corpus)
-output_shape = len(x[0][0]) # base 2 binary represented as an array for each number (input dimensino)
+latent_dim = 4  # Latent dimensionality of the encoding space. 
+num_outputs = len(pos_corpus) # should be 4
+
+# length of the words in a sentence (time step)
+sentence_length = len(words[0]) # should be 122
+
+# base 2 binary represented as an array for each number (input dimension)
+output_shape = len(x[0][0]) # should be 15
 
 model = Sequential()
 model.add(GRU(4, input_shape=(max_length, output_shape)))
